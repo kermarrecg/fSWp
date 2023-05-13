@@ -15,10 +15,10 @@ Each folder contains a main which name starts always with "sAPplication".
 Time series corresponding to the model are saved in ".txt format and can be found in each folder.
 
 Steps for running the software:
-$ In the sAPplication file: change the name of the time series file you want to fit as follows: 
+1. In the sAPplication file: change the name of the time series file you want to fit as follows: 
 "structData = readtable(['nameofthefile.txt']);"
-$ Press run
-$ Figures and various goodness of fit indicator are output
+2. Press run
+3. Figures and various goodness of fit indicators are output
 
 ### Prerequisites
 
@@ -55,24 +55,28 @@ They correspond to the following models:
 |**Noise (periodical component)**  | stochastic fSW  |stochastic fSW  |stochastic fSW  |stochastic fSW  |deterministic  |
 |**Example**   |  IGS DTS | NTAL | tenv format | HYDL, LPAL station | xx |
 
-$ For model 1, 2 and 4 we have used the time series from the International GPS Service (IGS) station DRAO (USA), as well as NEAH and LPAL (strong periodical components)
 
-$ For model 3, we have used examples from Wettzell, Germany with in total 6 GPS stations (WTZA, WTZJ, WTZR, WTZS, WTZZ and WTZL). The observations are in raw format and contains outliers, data gaps and jumps. A description of the tenv format can be found in the folder under tenv format.txt. 
-$ All time series are freely availabe to download for testing purpose under
+* For model 1, 2 and 4 we have used the time series from the International GPS Service (IGS) station DRAO (USA), as well as NEAH and LPAL (strong periodical components)
 
-		NTAL: http://rz-vm115.gfz-potsdam.de:8080/repository/entry/show?entryid=80daee1b-
-			ff73-481f-b0f3-18026282c03e
+* For model 3, we have used examples from Wettzell, Germany with in total 6 GPS stations (WTZA, WTZJ, WTZR, WTZS, WTZZ and WTZL). The observations are in raw format and contains outliers, data gaps and jumps. A description of the tenv format can be found in the folder under tenv format.txt. 
+
+* All time series are freely availabe to download for testing purpose under
+
+		NTAL: <http://rz-vm115.gfz-potsdam.de:8080/repository/entry/show?entryid=80daee1b-
+			ff73-481f-b0f3-18026282c03e>
 			
-		HYDL:  http://geodesy.unr.edu/NGLStationPages/GlobalStationList
+		HYDL:  <http://geodesy.unr.edu/NGLStationPages/GlobalStationList>
 		
-		PWV: https://doi.pangaea.de/10.1594/PANGAEA.862525
+		PWV: <https://doi.pangaea.de/10.1594/PANGAEA.862525>
 		
-		IGS GPS: http://geodesy.unr.edu/NGLStationPages/GlobalStationList
+		IGS GPS: <http://geodesy.unr.edu/NGLStationPages/GlobalStationList>
 
 
-### Add-on
+### Add-on: simulating a fSWp
 
-$ Additionally, we provide a set of functions to generate fSWp and fractional noise in the folder "SimulationsFN&fSW". The main file is called "sSimulations.m". Parameters can be changed to generate a fractional noise or a fSWp. They are described in the file "sSimulations.m".
+Additionally, we provide a set of functions to generate fSWp and fractional noise in the folder "SimulationsFN&fSW". The main file is called "sSimulations.m". 
+
+Parameters can be changed to generate a fractional noise or a fSWp. They are described in the file "sSimulations.m".
 
 
 Note:
@@ -93,9 +97,10 @@ They are automatically saved as .pdf in the folder
 
 
 We provide a file called "diagnostic.m" which output:
-$ the AIC, the BIC, the likelihood, the Sum2Corr (sum of square of the sample autocorrelation of the residuals), value of the trend (not relevant for model 3), uncertainty of the trend (from the AR(1), usual formulation in geodesy, see references below) and from the KF
 
-$ run the lines from the quantities you wish to output
+* the AIC, the BIC, the likelihood, the Sum2Corr (sum of square of the sample autocorrelation of the residuals), value of the trend (not relevant for model 3), uncertainty of the trend (from the AR(1), usual formulation in geodesy, see references below) and from the KF
+
+Just run the lines from the quantities you wish to output
 
 ## Additional Documentation & Acknowledgments
 
