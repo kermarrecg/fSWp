@@ -62,14 +62,18 @@ They correspond to the following models:
 
 * All time series are freely availabe to download for testing purpose under
 
-		NTAL: <http://rz-vm115.gfz-potsdam.de:8080/repository/entry/show?entryid=80daee1b-
+NTAL: 
+		<http://rz-vm115.gfz-potsdam.de:8080/repository/entry/show?entryid=80daee1b-
 			ff73-481f-b0f3-18026282c03e>
 			
-		HYDL:  <http://geodesy.unr.edu/NGLStationPages/GlobalStationList>
+HYDL:  
+		<http://geodesy.unr.edu/NGLStationPages/GlobalStationList>
 		
-		PWV: <https://doi.pangaea.de/10.1594/PANGAEA.862525>
+PWV: 
+		<https://doi.pangaea.de/10.1594/PANGAEA.862525>
 		
-		IGS GPS: <http://geodesy.unr.edu/NGLStationPages/GlobalStationList>
+IGS GPS: 
+		<http://geodesy.unr.edu/NGLStationPages/GlobalStationList>
 
 
 ### Add-on: simulating a fSWp
