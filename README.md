@@ -46,8 +46,10 @@ You will find 6 toolboxes:
 ### Models and time series
 
 They correspond to the following models:
+
+
 |   | **Model 1** | **Model 2** | **Model 3** |**Model 4** |**Model 5** |
-| ------------- | ------------- |
+| ------------- | ------------- | ------------- | ------------- |------------- | ------------- |
 |**Trend** |  deterministic |deterministic|local level stochastic|stochastic|deterministic
 |**Noise (linear component)**   |  AR(1) |ARMA(1,1) |AR(1) |irrelevant |AR(1) |
 |**Noise (periodical component)**  | stochastic fSW  |stochastic fSW  |stochastic fSW  |stochastic fSW  |deterministic  |
@@ -56,13 +58,17 @@ They correspond to the following models:
 $ For model 1, 2 and 4 we have used the time series from the International GPS Service (IGS) station DRAO (USA), as well as NEAH and LPAL (strong periodical components)
 
 $ For model 3, we have used examples from Wettzell, Germany with in total 6 GPS stations (WTZA, WTZJ, WTZR, WTZS, WTZZ and WTZL). The observations are in raw format and contains outliers, data gaps and jumps. A description of the tenv format can be found in the folder under tenv format.txt. 
-
 $ All time series are freely availabe to download for testing purpose under
+
 		NTAL: http://rz-vm115.gfz-potsdam.de:8080/repository/entry/show?entryid=80daee1b-
 			ff73-481f-b0f3-18026282c03e
+			
 		HYDL:  http://geodesy.unr.edu/NGLStationPages/GlobalStationList
+		
 		PWV: https://doi.pangaea.de/10.1594/PANGAEA.862525
+		
 		IGS GPS: http://geodesy.unr.edu/NGLStationPages/GlobalStationList
+
 
 ### Add-on
 
