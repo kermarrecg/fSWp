@@ -1,0 +1,266 @@
+%% APPLICATION
+    
+close all
+clear all
+%addpath('C:\Users\Fede85\Dropbox\Gegenbauer Process\fSWproject\Matlab\DataCleaning\')
+% econometrics toolbox required for autocorr
+%% Graphic parameters
+set(0,'DefaultAxesFontName','Times New Roman');
+set(0,'DefaultTextFontName','Times New Roman');
+set(0,'DefaultAxesFontSize',15);
+set(0,'DefaultTextFontSize',15);
+%% Load the GPS daily time series vy2
+LBpvalues=NaN(8,1); R2=NaN(8,1); SumCorr2=NaN(8,1);
+mPar=[];Miss=NaN(8,1);
+
+structBreaks = readtable(['Offsets_WTZR_and_Co-located.txt']);
+stringDate0= cell2mat(structBreaks.Var2);
+dateBreaks=datetime(stringDate0,'InputFormat','yyMMMdd');
+ 
+sbreaks=string(structBreaks.Var1) ;
+
+for jjj=  [1, 3:7]%1:8; [3 4 6]%  % 1 ok, 3 ok, 4 ok, 
+% 5 ok , 7 ok
+%for jjj= 8
+
+    if jjj==1; structData = readtable(['WTZZ.txt']); end
+    if jjj==2; structData = readtable(['WTZT.txt']); end
+    if jjj==3; structData = readtable(['WTZS.txt']); end
+    if jjj==4; structData = readtable(['WTZR.txt']); end
+    if jjj==5; structData = readtable(['WTZL.txt']); end
+    if jjj==6; structData = readtable(['WTZJ.txt']); end
+    if jjj==7; structData = readtable(['WTZA.txt']); end
+    if jjj==8; structData = readtable(['WETT.txt']); end
+
+    ID=string(structData.Var1(1));
+    sbreaksID=sbreaks;
+    indBreaks=find( sbreaksID==ID);
+    dateBreaksID=dateBreaks(indBreaks);
+    dateBreaksID=unique(dateBreaksID);
+    nBreaks=size(dateBreaksID,1);
+
+    vtime0 = datetime(structData.Var4,'convertfrom','modifiedjuliandate');
+    vy0    =structData.Var9;
+    vtime=(vtime0(1):vtime0(end))';
+    cn    = length(vtime);
+    vy2=NaN(cn,1); i=1;
+    for t=1:cn
+        if vtime(t)==vtime0(i)
+            vy2(t)= (vy0(i)); i=i+1;
+        end
+    end
+
+    mDummy=[];
+    for ii=1:nBreaks
+        mDummy=[mDummy, (vtime)> dateBreaksID(ii)];
+    end
+%end
+
+vy=vy2;
+
+cn    = length(vtime);
+
+% Percentage of missing data
+Miss(jjj)=sum(isnan(vy))/cn
+
+%% Plot the series
+g1 = figure('Name','Original Series');
+subplot(2,1,1)
+plot(vtime,  vy);
+xlim([vtime(1)  vtime(end)])
+%ylabel('Trading Volume', 'rotation', 90,'Interpreter','latex');
+xlabel('time', 'Interpreter','latex'); ylabel('',   'Interpreter','latex');
+title( strcat(ID,' Series ',string(jjj)), 'Fontweight', 'Normal', 'FontSize', 20,  'Interpreter','latex');
+subplot(2,1,2)
+[fxx,ww]=plomb(vy,[],2*pi*(0:cn-1)/cn);
+plot(ww,fxx,'b');
+%ylim([0 10000]);
+xlim([0, pi/4]);
+xlabel(' ', 'Interpreter','latex'); ylabel('',   'Interpreter','latex');
+title('GPS Periodogram ', 'Fontweight', 'Normal', 'FontSize', 20,  'Interpreter','latex');
+orient(g1,'landscape')
+print(g1,strcat(ID,' Series ',string(jjj)),'-dpdf', '-fillpage', '-painters','-r600')
+%%
+iTrend = 2; % LLTM 
+
+vfm   = 2*pi*(1:cn)'/365.25; 
+cf    = 2;
+cp=3; %arma(P,P) approx
+mZSeas = NaN(cn, 2*cf);
+for jf = 1:cf
+    mZSeas(:,2*jf-1:2*jf) = [cos(jf*vfm) sin(jf*vfm)];
+end
+mXreg =[   mZSeas];
+%vP0  = [-99; -5.9; 1.3*ones(cf,1); 0.0*ones(cf,1)]; % starting values transformed hyperpars
+
+opts = optimset('Display','iter','TolX',1e-9,'TolFun',1e-9,...
+                'Diagnostics','off', 'MaxIter', 400, 'MaxFunEvals', 400,...
+                'LargeScale', 'off', 'PlotFcns', @optimplotfval);
+
+[vP0,vLL]= fgrid_InitCondsLC(vy , mXreg, iTrend, mZSeas,cp ,jjj );
+
+%------------------ MLE --------------------------------------------------
+% % 
+f  = @(vP)fSsfLogLik(vP, vy, mXreg, iTrend, mZSeas,cp); % function 
+[vP, fval, exitflag, output] = fminsearch(f, vP0, opts);
+
+vd_hat0     = exp(vP(3:2+cf))./(1+exp(vP(3:2+cf)))
+vSigma_hat0 = exp(2*vP(3+cf:2+2*cf)) 
+dSeta_hat0  = exp(2*vP(1))
+if iTrend == 2
+    dSzeta_hat0 = exp(2*vP(2))
+end
+
+dthrshld=1.345  ; cadd=65;
+[mZt, mGG, mT, mHH, mW, va, mP, mW0] = fSetSSModel(vP, iTrend, mZSeas,cp);
+[ vyclean, vWeights ] = ...
+ fClean(vy, mZt, mGG, mT, mHH, 0, va, mP, mW0, mXreg, 1, dthrshld, cadd);
+
+% vy1=vy;
+% bounds=quantile(vy1,[0.01 0.99]) ;
+% vy1(vy1 <bounds(1))=NaN; vy1(vy1  >bounds(2))=NaN;
+% vyclean=vy1;
+
+% figure();plot(vtime,vyclean)
+% sum(isnan(vyclean))/cn
+
+
+vy=vyclean;   mXreg=[mDummy mXreg];
+
+%------------------ MLE --------------------------------------------------
+f  = @(vP)fSsfLogLik(vP, vy, mXreg, iTrend, mZSeas,cp); % function 
+[vP0,vLL]= fgrid_InitCondsLC(vy , mXreg, iTrend, mZSeas,cp ,jjj );
+[vP, fval, exitflag, output] = fminsearch(f, vP0, opts);
+
+vd_hat     = exp(vP(3:2+cf))./(1+exp(vP(3:2+cf)))
+vSigma_hat = exp(2*vP(3+cf:2+2*cf)) 
+dSeta_hat  = exp(2*vP(1))
+if iTrend == 2
+    dSzeta_hat = exp(2*vP(2))
+end
+mPar=[mPar; dSeta_hat, dSzeta_hat, vd_hat', vSigma_hat', exp(2*vP(end-1)),vP(end)/sqrt(1 + vP(end)^2)];
+
+
+[mZt, mGG, mT, mHH, mW, va, mP, mW0] = fSetSSModel(vP, iTrend, mZSeas,cp);
+[mAs, mPs, vBeta, mVarBeta,vRes, vVarRes] = fAugmentedStateSmoother(vy, mZt,...
+    mGG, mT, mHH, mW, va, mP, mW0, mXreg);
+ckd = size(mW0,2); 
+ 
+mArt_smooth=mAs(iTrend+2:end,:);mPrt_smooth=mPs(iTrend+2:end,:) ;
+SmoothEst=mArt_smooth([1:(cp+1):(2*cf)*(cp+1)],:);
+SmoothEst_var=mPrt_smooth([1:(cp+1):(  2*cf)*(cp+1)],:);
+
+g1=figure()
+plot(vtime,vy, 'b');hold on;plot(vtime,mAs(1,:)'+mXreg(:,1:nBreaks)*vBeta(ckd+1:ckd+nBreaks),'r','LineWidth',2)
+title(strcat(ID,'Trend component Series ',string(jjj)))
+orient(g1,'landscape')
+print(g1,strcat(ID,'Trend component Series ',string(jjj)),'-dpdf', '-fillpage', '-painters','-r600')
+
+g2=figure()
+plot( mAs(3,:)'+mXreg(:,1:nBreaks)*vBeta(ckd+1:ckd+nBreaks),'r','LineWidth',2)
+title('Red Noise component')
+orient(g2,'landscape')
+print(g2,strcat(ID,'Red Noise Series ',string(jjj)),'-dpdf', '-fillpage', '-painters','-r600')
+
+
+mX2=mXreg(:,nBreaks+1:end);
+vBeta2=vBeta(ckd+nBreaks+1:end);
+g1=figure()
+plot(vtime,  - mX2(:,1:2)*vBeta2(1:2) +  sum(mX2(:,1:2).* SmoothEst(1:2,:)',2) ,'r')
+title('1st Cyclical component')
+xlim([vtime(1) vtime(end)])
+orient(g1,'landscape') 
+print(g1,strcat(ID,'1st Cyclical component Series ',string(jjj)),'-dpdf', '-fillpage', '-painters','-r600')
+
+
+if cf>1
+g1=figure()
+plot(vtime, - mX2(:,3:4)*vBeta2(3:4) +  sum(mX2(:,3:4).* SmoothEst(3:4,:)',2) ,'r')
+title('2nd Cyclical component')
+xlim([vtime(1) vtime(end)])
+orient(g1,'landscape') 
+print(g1,strcat(ID,'2nd Cyclical component Series ',string(jjj)),'-dpdf', '-fillpage', '-painters','-r600')
+
+end
+g1=figure()
+subplot(2,1,1)
+plot(vtime,sqrt((SmoothEst(1,:)-vBeta2(1)).^2  + (SmoothEst(2,:)-vBeta2(2)).^2) ,'r')
+title('Amplitude 1st Cyclical component')
+xlim([vtime(1) vtime(end)])
+subplot(2,1,2)
+plot(vtime,atan((SmoothEst(2,:)-vBeta2(2))./(SmoothEst(1,:)-vBeta2(1))) ,'r')
+title('Phase 1st Cyclical component')
+xlim([vtime(1) vtime(end)])
+orient(g1,'landscape') 
+print(g1,strcat(ID,'1st Amplitude Phase Series ',string(jjj)),'-dpdf', '-fillpage', '-painters','-r600')
+if cf>1
+g1=figure()
+subplot(2,1,1)
+plot(vtime,sqrt((SmoothEst(3,:)-vBeta2(3)).^2  + (SmoothEst(4,:)-vBeta2(4)).^2) ,'r')
+title('Amplitude 2nd Cyclical component')
+xlim([vtime(1) vtime(end)])
+subplot(2,1,2)
+plot(vtime,atan((SmoothEst(4,:)-vBeta2(4))./(SmoothEst(3,:)-vBeta2(3))) ,'r')
+title('Phase 2nd Cyclical component')
+xlim([vtime(1) vtime(end)])
+orient(g1,'landscape') 
+print(g1,strcat(ID,'2nd Amplitude Phase Series ',string(jjj)),'-dpdf', '-fillpage', '-painters','-r600')
+end 
+
+% figure()
+% plot([vy mZSeas*vBeta(3:end)])
+% vseas = NaN(cn,1); vseas2 = NaN(cn,1);
+%  
+% for i = 1:cn
+%     vseas(i) = mZt(i,3:2+2*(cp+1)) * mAs(3:2+2*(cp+1), i);
+%     vseas2(i) = mZt(i,3+2*(cp+1):2+4*(cp+1)) * mAs(3+2*(cp+1):2+4*(cp+1), i);
+% end
+% vseasDet =mZSeas(:,1:2)*vBeta(3:4); vseasDet2 =mZSeas(:,3:4)*vBeta(5:6);
+% figure()
+% plot([vy  , vseas+vseasDet])
+% figure()
+% plot([vy,  vseas+vseasDet+vseas2+vseasDet2])
+
+%  
+%[vRes, vVarRes, mStatePred, mCovStatePred,dSigma2, dLogLikC, vBeta, mVarBeta] = fAugmentedKalmanFilterTpS(vy, mZt, mGG, mT, mHH, va, mP, mW0, mXreg);
+
+% [mZt0, mGG0, mT0, mHH0, va0, mP0 ] = SetStateSpaceModel_ExactLik(vP,iTrend, mZSeas,mXreg,vBeta,cp);
+% [vRes, vVarRes, mStatePred, mCovStatePred,...
+%     dLogLik ] = KalmanFilter_ExactLik(vy,mZt0 , mGG0, mT0, mHH0, va0, mP0);
+
+g4 = figure('Name','res');
+subplot(3,1,1);
+plot(vtime, vRes./sqrt(vVarRes))
+xlim([vtime(1) vtime(end)])
+title('Residuals: time series plot, periodogram, correlogram')
+subplot(3,1,2);
+[fxxRES,wwRES]=plomb(vRes./sqrt(vVarRes) ,[],2*pi*(0:cn-1)/cn);
+plot(wwRES,fxxRES,'b');xlim([0, 0.1]);title('Lomb-Scargle periodogram','Fontweight', 'Normal', 'FontSize', 15,  'Interpreter','latex')
+%[ fxxRES, wwRES ] = fPeriodogram(vRes./sqrt(vVarRes));
+xlabel('$\omega$', 'Interpreter','latex');
+ylabel('$I_{\epsilon}(\omega)$',   'Interpreter','latex');
+xlim([0, pi ]);
+subplot(3,1,3);
+Lag=cn-1;
+acfR =NaN(Lag+1,1);
+for k=0:Lag
+    acfR (k+1)= real( (1/cn) * sum(fxxRES(1:end).*exp(1i*k *wwRES(1:end)))) ;
+end
+SE=real(sqrt((1/cn)*(1+2*sum(real(acfR(1:51)/acfR(1)).^2))));bounds=[-SE SE];
+%[acfR,lags,bounds] = autocorr(vRes./sqrt(vVarRes),cn-1 );
+bar(0:50, acfR(1:51)/acfR(1),'r')
+% bar(0:50,acfR(1:51)/acfR(1),'r')
+yline(bounds(1)  , 'b--')
+yline( bounds(2)  , 'b--')
+% yline(2*SE , 'b--')
+% yline(-2*SE , 'b--')
+title('Sample autocorrelation', 'Fontweight', 'Normal', 'FontSize', 15,  'Interpreter','latex');
+xlabel('k','Fontweight', 'Normal', 'FontSize', 15,  'Interpreter','latex');
+ylabel('$\hat{\rho}_\epsilon(k)$','Fontweight', 'Normal', 'FontSize', 15,  'Interpreter','latex');
+orient(g4,'landscape')
+print(g4,strcat(ID,'Residuals Series ',string(jjj)),'-dpdf', '-fillpage', '-painters','-r600')
+SumCorr2(jjj)=sum((acfR(2)/acfR(1)).^2);
+end
+
+%close all
+save('WTZA_workspace')
