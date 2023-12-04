@@ -113,10 +113,14 @@ Just run the lines from the quantities you wish to output
 * You will find further information on the fSWp and the theory at:
 Proietti, T., & Maddanu, F.(2022). Modelling cycles in climate series: The fractional sinusoidal waveform process. Modeling Cycles In Climate Series. Journal of Econometrics. https://doi.org/10.1016/j.jeconom.2022.04.008
 
+* The model has been further applied to ethane time series at:
+  Maddanu, F., Proietti, T. Trends in atmospheric ethane. Climatic Change 176, 53 (2023). https://doi.org/10.1007/s10584-023-03508-1
+
 * For geodetic example, please refer to: 
 Davis, J. L., Wernicke, B. P., and Tamisiea, M. E. (2012), On seasonal signals in geodetic time series, J. Geophys. Res., 117, B01403, doi:10.1029/2011JB008690.
 Klos, A., Bos, M.S. & Bogusz, J. Detecting time-varying seasonal signal in GPS position time series with different noise levels. GPS Solut 22, 21 (2018). https://doi.org/10.1007/s10291-017-0686-6
 
-
+* The MATLAB code has been developed by Federico Maddanu, Laboratory AGM UMR8088, CY Cergy Paris Université, 2 Ave. Adolphe Chauvin, Cergy-Pontoise, 95302, France, with the collaboration of Tommaso Proietti, Department of Economics and Finance, Università di Roma “Tor Vergata”, via Columbia 2, Rome, 00133, Italy.
+  
 This study is supported by the Deutsche Forschungsgemein-
 schaft under the project KE2453/2-1
