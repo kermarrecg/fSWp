@@ -1,8 +1,8 @@
 # The fractional Sinusoidal Waveform process (fSWp)
 
-The fSWp models periodical time series considering that the periodicity and trend evolve stochastically according to possibly nonstationary long memory proccesses. It is estimated by inear state space methods (Kalman Filter).
+The fSWp models periodical time series considering that the periodicity and trend evolve stochastically according to possibly nonstationary long memory processes. It is estimated by linear state space methods (Kalman Filter).
 
-This repository contains packages of MATLAB functions that can be used to fit various time series with seasonal signals occuring within a geodetic context: 
+This repository contains packages of MATLAB functions that can be used to fit various time series with seasonal signals occurring within a geodetic context: 
 * vertical displacement time series from the Global Navigation Satellite Systems (DTS), 
 * Non Tidal Atmospheric Loading time series (NTAL), 
 * hydrological mass loading (HYDL), 
@@ -11,7 +11,7 @@ This repository contains packages of MATLAB functions that can be used to fit va
 
 ## Installation
 
-Each folder contains a main which name starts always with "sAPplication". 
+Each folder contains a main. Its name starts always with "sAPplication". 
 Time series corresponding to the model are saved in ".txt format and can be found in each folder.
 
 Steps for running the software:
@@ -22,9 +22,9 @@ Steps for running the software:
 
 ### Prerequisites
 
-You will need MATLAB, versions 2022a with the optimization toolbox
+You will need MATLAB, version 2022a with the optimization toolbox
 
-* For the use of the HYDL toolbox we recommand following processor and ram: 11th Gen Intel(R) Core(TM) i7-1185G7 @ 3.00GHz   3.00 GH to get optimal results
+* For the use of the HYDL toolbox we recommend the following processor and ram: 11th Gen Intel(R) Core(TM) i7-1185G7 @ 3.00GHz   3.00 GH to get optimal results
 and 32GB of ram
 
 
@@ -33,15 +33,16 @@ and 32GB of ram
 ### Toolboxes
 
 Each time series can be modelled as: Trend + noise + a*cos(\omega t) + a'*sin(\omega t) 
-where a and a' are the amplitudes of the periodical signals with angular frequency \omega and can be deterministic (constant) or stochastic (time varying)
+where a and a' are the amplitudes of the periodical signals with angular frequency \omega and can be deterministic (constant) or stochastic (time-varying)
 
-You will find 6 toolboxes:
+You will find 7 toolboxes:
 * IGS_forfSW_DETERM_TREND_plus_AR1_model1
 * NTAL_forfSW_DETERM_TREND_plus_ARMA11_model2
 * PWV_Pangea_DETERM_TREND_plus_AR1_model1
 * HYDL_forFSW_RW_TREND_model4
 * LPAL_forFSW_RW_TREND_model4
 * AllDeterministic_model5
+* AllDeterministicFracN
 
 ### Models and time series
 
@@ -56,11 +57,11 @@ They correspond to the following models:
 |**Example**   |  IGS DTS | NTAL | tenv format | HYDL, LPAL station | xx |
 
 
-* For model 1, 2 and 4 we have used the time series from the International GPS Service (IGS) station DRAO (USA), as well as NEAH and LPAL (strong periodical components)
+* For model 1, 2, and 4 we have used the time series from the International GPS Service (IGS) station DRAO (USA), as well as NEAH and LPAL (strong periodical components)
 
-* For model 3, we have used examples from Wettzell, Germany with in total 6 GPS stations (WTZA, WTZJ, WTZR, WTZS, WTZZ and WTZL). The observations are in raw format and contains outliers, data gaps and jumps. A description of the tenv format can be found in the folder under tenv format.txt. 
+* For model 3, we have used examples from Wettzell, Germany with in total of 6 GPS stations (WTZA, WTZJ, WTZR, WTZS, WTZZ and WTZL). The observations are in raw format and contain outliers, data gaps, and jumps. A description of the tenv format can be found in the folder under tenv format.txt. 
 
-* All time series are freely availabe to download for testing purpose under
+* All time series are freely available to download for testing purposes under
 
 NTAL: 
 		<http://rz-vm115.gfz-potsdam.de:8080/repository/entry/show?entryid=80daee1b-ff73-481f-b0f3-18026282c03e>
@@ -81,6 +82,10 @@ Additionally, we provide a set of functions to generate fSWp and fractional nois
 
 Parameters can be changed to generate a fractional noise or a fSWp. They are described in the file "sSimulations.m".
 
+### Add-on: 
+
+AllDeterministicFracN is a toolbox that allows fitting time series with a linear trend and deterministic periodical components. The residuals are modelled as a fractional noise, please refer to https://link.springer.com/article/10.1007/BF00665755 exemplarily for a definition. This noise is similar to the power law model as used in the software Hector (Hector user manual version 2.0, p29). The toolbox is available for testing purposes. The main is called sApplicationDetermFracN.m
+
 
 Note:
 *  We have chosen time series with yearly and semi-yearly periodical components. Depending on your context, the frequencies can be changed:
@@ -88,11 +93,11 @@ vPeriod  = [365.25] -> for yearly component ;
 dLambda  = (2*pi./vPeriod)*(1:harm); -> harm=2 for semi- and yearly components
 
 * Please avoid changing mX in the main file
-* For fitting other time series with similar functional model, you can change the MATLAB files starting with "fgrid_InitConds". Please contact us for support 
+* For fitting other time series with similar functional models, you can change the MATLAB files starting with "fgrid_InitConds". Please contact us for support 
 
 ## Output
 
-Following figures are output:
+The following figures are output:
 Residual diagnostics (periodogram, autocorrelation), original time series with trend, additional noise on the linear component, amplitude and phase of the periodical components, periodical components.
 They are automatically saved as .pdf in the folder
 
@@ -101,7 +106,7 @@ They are automatically saved as .pdf in the folder
 
 We provide a file called "diagnostic.m" which output:
 
-* the AIC, the BIC, the likelihood, the Sum2Corr (sum of square of the sample autocorrelation of the residuals), value of the trend (not relevant for model 3), uncertainty of the trend (from the AR(1), usual formulation in geodesy, see references below) and from the KF
+* the AIC, the BIC, the likelihood, the Sum2Corr (sum of square of the sample autocorrelation of the residuals), the value of the trend (not relevant for model 3), the uncertainty of the trend (from the AR(1), the usual formulation in geodesy, see references below) and from the KF
 
 Just run the lines from the quantities you wish to output
 
