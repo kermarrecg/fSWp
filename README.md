@@ -113,7 +113,7 @@ Just run the lines from the quantities you wish to output
 ## Additional Documentation & Acknowledgments
 
 * The cases treated in the available toolboxes are described in:
-.... arXiv to come
+ Kermarrec, G., Maddanu, F., Klos, A. et al. Modeling trends and periodic components in geodetic time series: a unified approach. J Geod 98, 17 (2024). https://doi.org/10.1007/s00190-024-01826-5
 
 * You will find further information on the fSWp and the theory at:
 Proietti, T., & Maddanu, F.(2022). Modelling cycles in climate series: The fractional sinusoidal waveform process. Modeling Cycles In Climate Series. Journal of Econometrics. https://doi.org/10.1016/j.jeconom.2022.04.008
